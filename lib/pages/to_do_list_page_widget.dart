@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
-class TodoListPage extends StatelessWidget {
+class TodoListPage extends StatefulWidget {
   const TodoListPage({Key? key}) : super(key: key);
 
   @override
+  State<TodoListPage> createState() => _TodoListPageState();
+}
+
+class _TodoListPageState extends State<TodoListPage> {
+  final TextEditingController tasksController = TextEditingController();
+
+  List<String> tasks = [];
+
+  @override
   Widget build(BuildContext context) {
-    final theme = ThemeData();
     return Scaffold(
       body: Center(
         child: Padding(
@@ -15,9 +23,10 @@ class TodoListPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: tasksController,
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Add task',
                       ),
@@ -29,14 +38,31 @@ class TodoListPage extends StatelessWidget {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(14),
-                      backgroundColor: theme.primaryColor,
+                      backgroundColor: const Color(0xFF20ADD0),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      String text = tasksController.text;
+                      setState(() {
+                        tasks.add(text);
+                      });
+                    },
                     child: const Icon(
                       Icons.add,
                       size: 30,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              ListView(
+                shrinkWrap: true,
+                children: [
+                  for (String task in tasks)
+                    ListTile(
+                      title: Text(task),
+                    ),
                 ],
               ),
               const SizedBox(
@@ -53,7 +79,7 @@ class TodoListPage extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryColor,
+                      backgroundColor: const Color(0xFF20ADD0),
                       padding: const EdgeInsets.all(14),
                     ),
                     child: const Text('Clean All'),
