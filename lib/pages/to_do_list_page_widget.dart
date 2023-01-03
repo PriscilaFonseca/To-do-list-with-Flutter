@@ -13,6 +13,8 @@ class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController tasksController = TextEditingController();
 
   final List<Tasks> _tasks = [];
+  Tasks? deletedTasks;
+  int? deletedTasksPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +96,7 @@ class _TodoListPageState extends State<TodoListPage> {
                       width: 8,
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => showDeleteDialog(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF20ADD0),
                         padding: const EdgeInsets.all(14),
@@ -111,11 +113,80 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
+  showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clean Everthing?'),
+        content: const Text('Are you sure you want to clear everything?'),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              deleteEverything();
+            },
+            child: const Text(
+              'Clean',
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w300, color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void deleteEverything() {
+    setState(
+      () {
+        _tasks.clear();
+      },
+    );
+  }
+
   onDelete(Tasks tasks) {
+    deletedTasks = tasks;
+    deletedTasksPosition = _tasks.indexOf(tasks);
     setState(
       () {
         _tasks.remove(tasks);
       },
+    );
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.white,
+        action: SnackBarAction(
+          label: 'Undo',
+          textColor: const Color(0xFF20ADD0),
+          onPressed: () {
+            setState(() {
+              _tasks.insert(deletedTasksPosition!, deletedTasks!);
+            });
+          },
+        ),
+        content: Text(
+          'Task ${tasks.title} removed',
+          style: const TextStyle(
+              fontSize: 20, fontWeight: FontWeight.w400, color: Colors.black),
+        ),
+      ),
     );
   }
 }
