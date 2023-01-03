@@ -12,7 +12,7 @@ class TodoListPage extends StatefulWidget {
 class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController tasksController = TextEditingController();
 
-  List<Tasks> tasks = [];
+  final List<Tasks> _tasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +49,15 @@ class _TodoListPageState extends State<TodoListPage> {
                       ),
                       onPressed: () {
                         String text = tasksController.text;
-                        setState(() {
-                          Tasks newTasks = Tasks(
-                            title: text,
-                            dateTime: DateTime.now(),
-                          );
-                          tasks.add(newTasks);
-                        });
+                        setState(
+                          () {
+                            Tasks newTasks = Tasks(
+                              title: text,
+                              dateTime: DateTime.now(),
+                            );
+                            _tasks.add(newTasks);
+                          },
+                        );
                         tasksController.clear();
                       },
                       child: const Icon(
@@ -72,9 +74,10 @@ class _TodoListPageState extends State<TodoListPage> {
                   child: ListView(
                     shrinkWrap: true,
                     children: [
-                      for (Tasks task in tasks)
+                      for (Tasks task in _tasks)
                         TasksListItemWidget(
                           tasks: task,
+                          onDelete: () => onDelete(task),
                         ),
                     ],
                   ),
@@ -85,7 +88,7 @@ class _TodoListPageState extends State<TodoListPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text('You have ${tasks.length} pending tasks'),
+                      child: Text('You have ${_tasks.length} pending tasks'),
                     ),
                     const SizedBox(
                       width: 8,
@@ -105,6 +108,14 @@ class _TodoListPageState extends State<TodoListPage> {
           ),
         ),
       ),
+    );
+  }
+
+  onDelete(Tasks tasks) {
+    setState(
+      () {
+        _tasks.remove(tasks);
+      },
     );
   }
 }
